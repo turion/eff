@@ -1,14 +1,19 @@
 let
   hostpkgs =  import <nixpkgs> {};
+  rev = "0c41a90251e3c0613cb85cb0a3c1327950d9dd7e";
   src = hostpkgs.fetchgit {
     url = "https://gitlab.haskell.org/lexi.lambda/ghc.git";
-    rev = "0c41a90251e3c0613cb85cb0a3c1327950d9dd7e";
+    inherit rev;
     sha256 = "196z6wvrfc99mzfbld3fiyxmmmzfg4bnnzp6m74y5f5pl2b29dvl";
   };
 
   # src = fetchTarball "https://gitlab.haskell.org/lexi.lambda/ghc/-/archive/0c41a90251e3c0613cb85cb0a3c1327950d9dd7e/ghc-0c41a90251e3c0613cb85cb0a3c1327950d9dd7e.tar.gz";
 
-  overlay = self: super: {
+  overlay = self: super: let
+    ghc = (super.haskell.compiler.ghcHEAD.override { version = "9.1.20201212"; }).overrideAttrs (old: {
+      inherit src;
+    });
+  in {
     haskell = super.haskell // {
       packages = super.haskell.packages // {
         # ghc8101 = super.haskell.packages.ghc8101.override {
@@ -17,10 +22,11 @@ let
         #   });
         # };
         ghcHEAD = super.haskell.packages.ghcHEAD.override {
-          ghc = super.haskell.compiler.ghcHEAD.overrideAttrs (old: {
-            inherit src;
-          });
+          inherit ghc;
         };
+      };
+      compilers = super.haskell.compilers // {
+        ghcHEAD = ghc;
       };
     };
   };
