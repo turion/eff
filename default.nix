@@ -24,9 +24,13 @@ let
         ghcHEAD = super.haskell.packages.ghcHEAD.override {
           inherit ghc;
         };
+        ghc901 = super.haskell.packages.ghc901.override {
+          inherit ghc;
+        };
       };
       compilers = super.haskell.compilers // {
         ghcHEAD = ghc;
+        ghc901 = ghc;
       };
     };
   };
@@ -36,7 +40,7 @@ in
 }:
 
 let
-  haskellPackages = nixpkgs.pkgs.haskell.packages.ghcHEAD.override {
+  haskellPackages = nixpkgs.pkgs.haskell.packages.ghc901.override {
     overrides = self: super: {
       eff = self.callCabal2nix "eff" ./eff {};
     };
