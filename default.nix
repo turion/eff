@@ -10,7 +10,14 @@ let
   # src = fetchTarball "https://gitlab.haskell.org/lexi.lambda/ghc/-/archive/0c41a90251e3c0613cb85cb0a3c1327950d9dd7e/ghc-0c41a90251e3c0613cb85cb0a3c1327950d9dd7e.tar.gz";
 
   overlay = self: super: let
-    ghc = (super.haskell.compiler.ghcHEAD.override { version = "9.1.20201212"; }).overrideAttrs (old: {
+    ghc = (super.haskell.compiler.ghcHEAD.override {
+      version = "9.1.20201212";
+      # bootPkgs = super.haskell.packages.ghc8102Binary.override {
+      #   overrides = self: super: {
+      #     alex = self.callHackage "alex" "3.2.5" {};
+      #   };
+      # };
+    }).overrideAttrs (old: {
       inherit src;
     });
   in {
@@ -26,6 +33,16 @@ let
         };
         ghc901 = super.haskell.packages.ghc901.override {
           inherit ghc;
+          overrides = self: super: {
+            # See https://www.mail-archive.com/ghc-devs@haskell.org/msg19129.html
+            alex = self.callHackage "alex" "3.2.5" {};
+          };
+      };
+        ghc8102Binary = super.haskell.packages.ghc8102Binary.override { # workaround
+          overrides = self: super: {
+            # See https://www.mail-archive.com/ghc-devs@haskell.org/msg19129.html
+            alex = self.callHackage "alex" "3.2.5" {};
+          };
         };
       };
       compilers = super.haskell.compilers // {
