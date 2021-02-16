@@ -1,16 +1,16 @@
 let
   hostpkgs =  import <nixpkgs> {};
-  rev = "0c41a90251e3c0613cb85cb0a3c1327950d9dd7e";
+  rev = "e81b78a68f54db78b5569fd9403c4b4aaeab7f13";
   src = hostpkgs.fetchgit {
     url = "https://gitlab.haskell.org/lexi.lambda/ghc.git";
     inherit rev;
-    sha256 = "196z6wvrfc99mzfbld3fiyxmmmzfg4bnnzp6m74y5f5pl2b29dvl";
+    sha256 = "1x20vzdfc951j5x8y6wfc42i32j2gpkm4sgixz16y5pf3qsyfy32";
   };
 
   # src = fetchTarball "https://gitlab.haskell.org/lexi.lambda/ghc/-/archive/0c41a90251e3c0613cb85cb0a3c1327950d9dd7e/ghc-0c41a90251e3c0613cb85cb0a3c1327950d9dd7e.tar.gz";
 
   overlay = self: super: let
-    ghc = (super.haskell.compiler.ghcHEAD.override { version = "9.1.20201212"; }).overrideAttrs (old: {
+    ghc = (super.haskell.compiler.ghcHEAD.override { version = "8.11.20200115"; }).overrideAttrs (old: {
       inherit src;
     });
   in {
@@ -24,13 +24,13 @@ let
         ghcHEAD = super.haskell.packages.ghcHEAD.override {
           inherit ghc;
         };
-        ghc901 = super.haskell.packages.ghc901.override {
-          inherit ghc;
-        };
+        # ghc901 = super.haskell.packages.ghc901.override {
+        #   inherit ghc;
+        # };
       };
       compilers = super.haskell.compilers // {
         ghcHEAD = ghc;
-        ghc901 = ghc;
+        # ghc901 = ghc;
       };
     };
   };
@@ -40,7 +40,7 @@ in
 }:
 
 let
-  haskellPackages = nixpkgs.pkgs.haskell.packages.ghc901.override {
+  haskellPackages = nixpkgs.pkgs.haskell.packages.ghcHEAD.override {
     overrides = self: super: {
       eff = self.callCabal2nix "eff" ./eff {};
     };
